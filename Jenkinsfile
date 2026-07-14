@@ -1,6 +1,14 @@
 pipeline {
     agent any
 
+        options {
+        skipDefaultCheckout(true)
+         timestamps()
+    }
+    environment {
+        AWS_REGION = 'us-east-1'
+    }
+
     stages {
         stage('Checkout') {
             steps {
@@ -20,6 +28,13 @@ pipeline {
         }
         stage('Terraform Format') {
             steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-creds',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ])
                 sh 'terraform fmt -check -recursive'
             }
         }
@@ -35,8 +50,14 @@ pipeline {
         }
                 stage('Terraform plan') {
             steps {
-                sh 'terraform plan'
-            }
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-creds',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ])
+            terraform plan -out=tfplan            }
         }
     }
 }
