@@ -86,6 +86,21 @@ pipeline {
                 }
             }
         }
+        stage('Terraform Destroy') {
+    steps {
+        withCredentials([
+            usernamePassword(
+                credentialsId: 'aws-creds',
+                usernameVariable: 'AWS_ACCESS_KEY_ID',
+                passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+            )
+        ]) {
+            sh '''
+                terraform destroy -auto-approve
+            '''
+        }
+    }
+}
     }
 
     post {
