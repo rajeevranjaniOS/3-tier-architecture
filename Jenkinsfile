@@ -1,32 +1,36 @@
 pipeline {
     agent any
 
-        options {
+    options {
         skipDefaultCheckout(true)
-         timestamps()
+        timestamps()
     }
+
     environment {
         AWS_REGION = 'us-east-1'
     }
 
     stages {
+
         stage('Checkout') {
             steps {
                 checkout scm
             }
         }
 
-        stage('Hello') {
-            steps {
-                echo 'Pipeline is working!'
-            }
-        }
         stage('Terraform Version') {
             steps {
-                sh 'terraform --version'
+                sh 'terraform version'
             }
         }
+
         stage('Terraform Format') {
+            steps {
+                sh 'terraform fmt -check -recursive'
+            }
+        }
+
+        stage('Terraform Init') {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -34,21 +38,19 @@ pipeline {
                         usernameVariable: 'AWS_ACCESS_KEY_ID',
                         passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                     )
-                ])
-                sh 'terraform fmt -check -recursive'
+                ]) {
+                    sh 'terraform init'
+                }
             }
         }
-                stage('Terraform Init') {
-            steps {
-                sh 'terraform init'
-            }
-        }
+
         stage('Terraform Validate') {
             steps {
                 sh 'terraform validate'
             }
         }
-                stage('Terraform plan') {
+
+        stage('Terraform Plan') {
             steps {
                 withCredentials([
                     usernamePassword(
@@ -56,8 +58,18 @@ pipeline {
                         usernameVariable: 'AWS_ACCESS_KEY_ID',
                         passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                     )
-                ])
-            terraform plan -out=tfplan            }
+                ]) {
+                    sh '''
+                        terraform plan -out=tfplan
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            archiveArtifacts artifacts: 'tfplan'
         }
     }
 }
