@@ -2,19 +2,16 @@ pipeline {
     agent any
 
     stages {
-
         stage('Checkout') {
             steps {
-                echo 'Checking out source code...'
                 checkout scm
             }
         }
 
-        stage('Terraform Version') {
+        stage('Hello') {
             steps {
-                sh 'terraform version'
+                echo 'Pipeline is working!'
             }
         }
-
     }
 }
