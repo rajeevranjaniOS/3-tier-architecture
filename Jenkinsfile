@@ -23,5 +23,10 @@ pipeline {
                 sh 'terraform fmt -check -recursive'
             }
         }
+                stage('Terraform Init') {
+            steps {
+                sh 'terraform init'
+            }
+        }
     }
 }
