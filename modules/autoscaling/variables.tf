@@ -15,13 +15,13 @@ variable "sg" {
 }
 
 variable "db_config" {
-  type = object( #A
-    { #A
+  type = object(        #A
+    {                   #A
       user     = string #A
       password = string #A
       database = string #A
       hostname = string #A
       port     = string #A
-    } #A
-  ) #A
+    }                   #A
+  )                     #A
 }
