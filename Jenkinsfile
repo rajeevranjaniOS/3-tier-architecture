@@ -59,9 +59,30 @@ pipeline {
                         passwordVariable: 'AWS_SECRET_ACCESS_KEY'
                     )
                 ]) {
-                    sh '''
-                        terraform plan -out=tfplan
-                    '''
+                    sh 'terraform plan -out=tfplan'
+                }
+            }
+        }
+
+        stage('Approval') {
+            steps {
+                input(
+                    message: 'Approve Terraform Apply?',
+                    ok: 'Deploy'
+                )
+            }
+        }
+
+        stage('Terraform Apply') {
+            steps {
+                withCredentials([
+                    usernamePassword(
+                        credentialsId: 'aws-creds',
+                        usernameVariable: 'AWS_ACCESS_KEY_ID',
+                        passwordVariable: 'AWS_SECRET_ACCESS_KEY'
+                    )
+                ]) {
+                    sh 'terraform apply -auto-approve tfplan'
                 }
             }
         }
