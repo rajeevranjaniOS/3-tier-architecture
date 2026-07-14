@@ -13,5 +13,10 @@ pipeline {
                 echo 'Pipeline is working!'
             }
         }
+        stage('Terraform Version') {
+            steps {
+                sh 'terraform --version'
+            }
+        }
     }
 }
