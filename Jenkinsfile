@@ -18,5 +18,10 @@ pipeline {
                 sh 'terraform --version'
             }
         }
+        stage('Terraform Format') {
+            steps {
+                sh 'terraform fmt -check -recursive'
+            }
+        }
     }
 }
